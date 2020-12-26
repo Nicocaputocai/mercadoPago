@@ -1,9 +1,32 @@
 var express = require('express');
 var exphbs  = require('express-handlebars');
 var port = process.env.PORT || 3000
+const mercadopago = require ('mercadopago');
 
 var app = express();
- 
+ // Agrega credenciales
+mercadopago.configure({
+    access_token: 'PROD_ACCESS_TOKEN'
+  });
+  
+  // Crea un objeto de preferencia
+  let preference = {
+    items: [
+      {
+        title: 'Mi producto',
+        unit_price: 100,
+        quantity: 1,
+      }
+    ]
+  };
+  
+  mercadopago.preferences.create(preference)
+  .then(function(response){
+  // Este valor reemplazará el string "<%= global.id %>" en tu HTML
+    global.id = response.body.id;
+  }).catch(function(error){
+    console.log(error);
+  });
 app.engine('handlebars', exphbs());
 app.set('view engine', 'handlebars');
 
@@ -18,5 +41,6 @@ app.get('/', function (req, res) {
 app.get('/detail', function (req, res) {
     res.render('detail', req.query);
 });
+
 
 app.listen(port);
