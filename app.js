@@ -8,8 +8,9 @@ var app = express();
 mercadopago.configure({
     access_token: 'PROD_ACCESS_TOKEN'
   });
-  
   // Crea un objeto de preferencia
+  class Mp{
+  async mercadopago({request}){
   let preference = {
     items: [
       {
@@ -20,13 +21,11 @@ mercadopago.configure({
     ]
   };
   
-  mercadopago.preferences.create(preference)
-  .then(function(response){
-  // Este valor reemplazará el string "<%= global.id %>" en tu HTML
-    global.id = response.body.id;
-  }).catch(function(error){
-    console.log(error);
-  });
+  const res = await mercadopago.preferences.create(preference)
+
+  return res
+    }
+  }
 app.engine('handlebars', exphbs());
 app.set('view engine', 'handlebars');
 
@@ -41,6 +40,6 @@ app.get('/', function (req, res) {
 app.get('/detail', function (req, res) {
     res.render('detail', req.query);
 });
-
+app.post('api/v1/mercadopago', Mp)
 
 app.listen(port);
